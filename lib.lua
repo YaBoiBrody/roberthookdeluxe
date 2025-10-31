@@ -44,7 +44,7 @@ local library = {
 	BlurSize = 24,
 	FieldOfView = CurrentCam.FieldOfView,
 
-	Key = UserInputService.TouchEnabled and Enum.KeyCode.P or Enum.KeyCode.RightShift,
+	Key = UserInputService.TouchEnabled and Enum.KeyCode.P or Enum.KeyCode.LeftAlt,
 	fps = 0,
 	Debug = true,
 
@@ -871,7 +871,7 @@ function library:Init(Config)
 
 	function library:SetCompany(text)
 		library.company = text
-		company.Text = ("%s: "):format(text) or ""
+		company.Text = text or ""
 		return self
 	end
 	library:SetCompany(library.company)
@@ -882,7 +882,7 @@ function library:Init(Config)
 	headerLabel.LayoutOrder = 2
 	headerLabel.Size = UDim2.new(1, 0, 1, 0)
 	headerLabel.Font = library.Font
-	headerLabel.Text = library.title
+	headerLabel.Text = ""
  headerLabel.RichText = true
 	headerLabel.TextColor3 = Color3.fromRGB(198, 198, 198)
 	headerLabel.TextSize = 16.000
