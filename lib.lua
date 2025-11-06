@@ -1668,7 +1668,15 @@ function library:Init(Config)
 					Return = "enter",
 				}
 
-				keybindButtonLabel.Text = default_t and (Shortcuts[default_t.Name] or default_t.Name) or "None"
+				local _initialKeyText = "None"
+				if default_t then
+					local _name = Shortcuts[default_t.Name] or default_t.Name
+					if _name == "Unknown" then
+						_name = "None"
+					end
+					_initialKeyText = _name
+				end
+				keybindButtonLabel.Text = _initialKeyText
 				TweenWrapper:CreateStyle("keybind", 0.08)
 
 				local NewKeybindSize = TextService:GetTextSize(
@@ -1920,7 +1928,11 @@ function library:Init(Config)
 				Backspace = "None",
 			}
 
-			keybindButtonLabel.Text = Shortcuts[default.Name] or default.Name
+			local _keyName = Shortcuts[default.Name] or default.Name
+			if _keyName == "Unknown" then
+				_keyName = "None"
+			end
+			keybindButtonLabel.Text = _keyName
 			TweenWrapper:CreateStyle("keybind", 0.08)
 
 			local NewKeybindSize = TextService:GetTextSize(
@@ -2635,18 +2647,14 @@ function library:Init(Config)
 				or ValueNum .. suffix
 			sliderValue.Text = slideText
 			local function UpdateSlider()
-				TweenService:Create(
-					sliderIndicator,
-					TweenWrapper.Styles["slider_drag"],
-					{
-						Size = UDim2.new(
-							0,
-							math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X),
-							0,
-							12
-						),
-					}
-				):Play()
+				TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {
+					Size = UDim2.new(
+						0,
+						math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X),
+						0,
+						12
+					),
+				}):Play()
 
 				ValueNum = math.floor(
 					(
@@ -2682,22 +2690,14 @@ function library:Init(Config)
 						callback(ValueNum)
 					end)
 
-					TweenService:Create(
-						sliderIndicator,
-						TweenWrapper.Styles["slider_drag"],
-						{
-							Size = UDim2.new(
-								0,
-								math.clamp(
-									Mouse.X - sliderIndicator.AbsolutePosition.X,
-									0,
-									sliderBackground.AbsoluteSize.X
-								),
-								0,
-								12
-							),
-						}
-					):Play()
+					TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {
+						Size = UDim2.new(
+							0,
+							math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X),
+							0,
+							12
+						),
+					}):Play()
 					if not UserInputService.WindowFocused then
 						moveconnection:Disconnect()
 					end
@@ -2720,22 +2720,18 @@ function library:Init(Config)
 							callback(ValueNum)
 						end)
 
-						TweenService:Create(
-							sliderIndicator,
-							TweenWrapper.Styles["slider_drag"],
-							{
-								Size = UDim2.new(
+						TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {
+							Size = UDim2.new(
+								0,
+								math.clamp(
+									Mouse.X - sliderIndicator.AbsolutePosition.X,
 									0,
-									math.clamp(
-										Mouse.X - sliderIndicator.AbsolutePosition.X,
-										0,
-										sliderBackground.AbsoluteSize.X
-									),
-									0,
-									12
+									sliderBackground.AbsoluteSize.X
 								),
-							}
-						):Play()
+								0,
+								12
+							),
+						}):Play()
 						moveconnection:Disconnect()
 						releaseconnection:Disconnect()
 					end
@@ -2776,18 +2772,14 @@ function library:Init(Config)
 				new = new or values.min
 				values.min = new
 				slideText = compare and new .. compareSign .. tostring(values.max - 1) .. suffix or ValueNum .. suffix
-				TweenService:Create(
-					sliderIndicator,
-					TweenWrapper.Styles["slider_drag"],
-					{
-						Size = UDim2.new(
-							0,
-							math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X),
-							0,
-							12
-						),
-					}
-				):Play()
+				TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {
+					Size = UDim2.new(
+						0,
+						math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X),
+						0,
+						12
+					),
+				}):Play()
 				return self
 			end
 
