@@ -7,7 +7,9 @@
   This is also no longer speific to Synapse-X
 ]]
 
-local CloneRef = cloneref or function(a)return a end
+local CloneRef = cloneref or function(a)
+	return a
+end
 
 --// Service handlers
 local Services = setmetatable({}, {
@@ -24,21 +26,23 @@ local Mouse = CloneRef(Player:GetMouse())
 -- / Services
 local UserInputService = Services.UserInputService
 local TextService = Services.TextService
-local TweenService =Services.TweenService
+local TweenService = Services.TweenService
 local RunService = Services.RunService
 local CoreGui = RunService:IsStudio() and CloneRef(Player:WaitForChild("PlayerGui")) or Services.CoreGui
 local TeleportService = Services.TeleportService
 local Workspace = Services.Workspace
 local CurrentCam = Workspace.CurrentCamera
 
-local hiddenUI = get_hidden_gui or gethui or function(a)return CoreGui end
+local hiddenUI = get_hidden_gui or gethui or function(a)
+	return CoreGui
+end
 
--- / Defaults 
+-- / Defaults
 local OptionStates = {} -- Used for panic
 local library = {
 	title = "Bozo depso",
 	company = "Company",
-	
+
 	RainbowEnabled = true,
 	BlurEffect = true,
 	BlurSize = 24,
@@ -59,16 +63,18 @@ local library = {
 
 	Font = Enum.Font.Code,
 
-	rainbowColors = ColorSequence.new{
-		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(241, 137, 53)), 
-		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(241, 53, 106)), 
-		ColorSequenceKeypoint.new(0.66, Color3.fromRGB(133, 53, 241)), 
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(53, 186, 241))
-	}
+	rainbowColors = ColorSequence.new({
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(241, 137, 53)),
+		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(241, 53, 106)),
+		ColorSequenceKeypoint.new(0.66, Color3.fromRGB(133, 53, 241)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(53, 186, 241)),
+	}),
 }
 
 local function Warn(...)
-	if not library.Debug then return end
+	if not library.Debug then
+		return
+	end
 	warn("Depso:", ...)
 end
 
@@ -91,8 +97,8 @@ local TweenWrapper = {}
 function TweenWrapper:Init()
 	self.RealStyles = {
 		Default = {
-			TweenInfo.new(0.17, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0)
-		}
+			TweenInfo.new(0.17, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0),
+		},
 	}
 	self.Styles = setmetatable({}, {
 		__index = function(_, Key)
@@ -107,21 +113,17 @@ function TweenWrapper:Init()
 end
 
 function TweenWrapper:CreateStyle(name, speed, ...)
-	if not name then 
-		return TweenInfo.new(0) 
+	if not name then
+		return TweenInfo.new(0)
 	end
 
-	local Tweeninfo = TweenInfo.new(
-		speed or 0.17, 
-		...
-	)
+	local Tweeninfo = TweenInfo.new(speed or 0.17, ...)
 
 	self.RealStyles[name] = Tweeninfo
 	return Tweeninfo
 end
 
 TweenWrapper:Init()
-
 
 -- / Dragging
 local function EnableDrag(obj, latency)
@@ -134,23 +136,29 @@ local function EnableDrag(obj, latency)
 	local input = nil
 	local start = nil
 	local startPos = obj.Position
-	
+
 	local function InputIsAccepted(Input)
 		local UserInputType = Input.UserInputType
-		
-		if UserInputType == Enum.UserInputType.Touch then return true end
-		if UserInputType == Enum.UserInputType.MouseButton1 then return true end
-		
+
+		if UserInputType == Enum.UserInputType.Touch then
+			return true
+		end
+		if UserInputType == Enum.UserInputType.MouseButton1 then
+			return true
+		end
+
 		return false
 	end
 
 	obj.InputBegan:Connect(function(Input)
-		if not InputIsAccepted(Input) then return end
-		
+		if not InputIsAccepted(Input) then
+			return
+		end
+
 		toggled = true
 		start = Input.Position
 		startPos = obj.Position
-		
+
 		Input.Changed:Connect(function()
 			if Input.UserInputState == Enum.UserInputState.End then
 				toggled = false
@@ -160,22 +168,25 @@ local function EnableDrag(obj, latency)
 
 	obj.InputChanged:Connect(function(Input)
 		local MouseMovement = Input.UserInputType == Enum.UserInputType.MouseMovement
-		if not MouseMovement and not InputIsAccepted(Input) then return end 
-		
+		if not MouseMovement and not InputIsAccepted(Input) then
+			return
+		end
+
 		input = Input
 	end)
 
 	UserInputService.InputChanged:Connect(function(Input)
 		if Input == input and toggled then
 			local Delta = input.Position - start
-			local Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
-			TweenService:Create(obj, TweenInfo.new(latency), {Position = Position}):Play()
+			local Position =
+				UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
+			TweenService:Create(obj, TweenInfo.new(latency), { Position = Position }):Play()
 		end
 	end)
 end
 
 RunService.RenderStepped:Connect(function(v)
-	library.fps =  math.round(1/v)
+	library.fps = math.round(1 / v)
 end)
 
 function library:RoundNumber(int, float)
@@ -218,14 +229,10 @@ function library:GetJobId()
 end
 
 function library:Rejoin()
-	TeleportService:TeleportToPlaceInstance(
-		library:GetPlaceId(), 
-		library:GetJobId(), 
-		library:GetUserId()
-	)
+	TeleportService:TeleportToPlaceInstance(library:GetPlaceId(), library:GetJobId(), library:GetUserId())
 end
 
-function library:Copy(input) 
+function library:Copy(input)
 	local clipBoard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
 	if clipBoard then
 		clipBoard(input)
@@ -260,7 +267,7 @@ function library:GetTime(type)
 	elseif type == "ISO" then -- ISO / UTC ( 1min = 1, 1hour = 100)
 		return os.date("%z")
 	elseif type == "zone" then -- time zone
-		return os.date("%Z") 
+		return os.date("%Z")
 	end
 end
 
@@ -292,7 +299,7 @@ function library:GetYear(type)
 	end
 end
 
-function library:UnlockFps(new) 
+function library:UnlockFps(new)
 	if setfpscap then
 		setfpscap(new)
 	end
@@ -302,13 +309,15 @@ TweenWrapper:CreateStyle("Rainbow", 5, Enum.EasingStyle.Linear, Enum.EasingDirec
 function library:ApplyRainbow(instance, Wave)
 	local Colors = library.rainbowColors
 	local RainbowEnabled = library.RainbowEnabled
-	
-	if not RainbowEnabled then return end
+
+	if not RainbowEnabled then
+		return
+	end
 
 	if not Wave then
 		instance.BackgroundColor3 = Colors.Keypoints[1].Value
 		TweenService:Create(instance, TweenWrapper.Styles["Rainbow"], {
-			BackgroundColor3 =  Colors.Keypoints[#Colors.Keypoints].Value
+			BackgroundColor3 = Colors.Keypoints[#Colors.Keypoints].Value,
 		}):Play()
 
 		return
@@ -319,7 +328,7 @@ function library:ApplyRainbow(instance, Wave)
 	gradient.Color = Colors
 
 	TweenService:Create(gradient, TweenWrapper.Styles["Rainbow"], {
-		Offset = Vector2.new(0.8, 0)
+		Offset = Vector2.new(0.8, 0),
 	}):Play()
 end
 
@@ -395,7 +404,10 @@ function library:Init(Config)
 		barLayout.Parent = barFolder
 		barLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-		backgroundGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28))}
+		backgroundGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)),
+			ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28)),
+		})
 		backgroundGradient.Rotation = 90
 		backgroundGradient.Parent = background
 
@@ -414,7 +426,12 @@ function library:Init(Config)
 		waterText.TextSize = 14.000
 		waterText.RichText = true
 
-		local NewSize = TextService:GetTextSize(waterText.Text, waterText.TextSize, waterText.Font, Vector2.new(math.huge, math.huge))
+		local NewSize = TextService:GetTextSize(
+			waterText.Text,
+			waterText.TextSize,
+			waterText.Font,
+			Vector2.new(math.huge, math.huge)
+		)
 		waterText.Size = UDim2.new(0, NewSize.X + 8, 0, 24)
 
 		waterPadding.Parent = waterText
@@ -428,14 +445,15 @@ function library:Init(Config)
 		backgroundLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 
 		coroutine.wrap(function()
-			TweenService:Create(edge, TweenWrapper.Styles["wm"], {BackgroundTransparency = 0}):Play()
-			TweenService:Create(edge, TweenWrapper.Styles["wm"], {Size = UDim2.new(0, NewSize.x + 10, 0, 26)}):Play()
-			TweenService:Create(background, TweenWrapper.Styles["wm"], {BackgroundTransparency = 0}):Play()
-			TweenService:Create(background, TweenWrapper.Styles["wm"], {Size = UDim2.new(0, NewSize.x + 8, 0, 24)}):Play()
-			wait(.2)
-			TweenService:Create(bar, TweenWrapper.Styles["wm"], {Size = UDim2.new(0, NewSize.x + 8, 0, 1)}):Play()
-			wait(.1)
-			TweenService:Create(waterText, TweenWrapper.Styles["wm"], {TextTransparency = 0}):Play()
+			TweenService:Create(edge, TweenWrapper.Styles["wm"], { BackgroundTransparency = 0 }):Play()
+			TweenService:Create(edge, TweenWrapper.Styles["wm"], { Size = UDim2.new(0, NewSize.x + 10, 0, 26) }):Play()
+			TweenService:Create(background, TweenWrapper.Styles["wm"], { BackgroundTransparency = 0 }):Play()
+			TweenService:Create(background, TweenWrapper.Styles["wm"], { Size = UDim2.new(0, NewSize.x + 8, 0, 24) })
+				:Play()
+			wait(0.2)
+			TweenService:Create(bar, TweenWrapper.Styles["wm"], { Size = UDim2.new(0, NewSize.x + 8, 0, 1) }):Play()
+			wait(0.1)
+			TweenService:Create(waterText, TweenWrapper.Styles["wm"], { TextTransparency = 0 }):Play()
 		end)()
 
 		local WatermarkFunctions = {}
@@ -454,12 +472,23 @@ function library:Init(Config)
 			new = new or text
 			waterText.Text = new
 
-			local NewSize = TextService:GetTextSize(waterText.Text, waterText.TextSize, waterText.Font, Vector2.new(math.huge, math.huge))
+			local NewSize = TextService:GetTextSize(
+				waterText.Text,
+				waterText.TextSize,
+				waterText.Font,
+				Vector2.new(math.huge, math.huge)
+			)
 			coroutine.wrap(function()
-				TweenService:Create(edge, TweenWrapper.Styles["wm_2"], {Size = UDim2.new(0, NewSize.x + 10, 0, 26)}):Play()
-				TweenService:Create(background, TweenWrapper.Styles["wm_2"], {Size = UDim2.new(0, NewSize.x + 8, 0, 24)}):Play()
-				TweenService:Create(bar, TweenWrapper.Styles["wm_2"], {Size = UDim2.new(0, NewSize.x + 8, 0, 1)}):Play()
-				TweenService:Create(waterText, TweenWrapper.Styles["wm_2"], {Size = UDim2.new(0, NewSize.x + 8, 0, 1)}):Play()
+				TweenService:Create(edge, TweenWrapper.Styles["wm_2"], { Size = UDim2.new(0, NewSize.x + 10, 0, 26) })
+					:Play()
+				TweenService
+					:Create(background, TweenWrapper.Styles["wm_2"], { Size = UDim2.new(0, NewSize.x + 8, 0, 24) })
+					:Play()
+				TweenService:Create(bar, TweenWrapper.Styles["wm_2"], { Size = UDim2.new(0, NewSize.x + 8, 0, 1) })
+					:Play()
+				TweenService
+					:Create(waterText, TweenWrapper.Styles["wm_2"], { Size = UDim2.new(0, NewSize.x + 8, 0, 1) })
+					:Play()
 			end)()
 
 			return self
@@ -471,7 +500,6 @@ function library:Init(Config)
 		end
 		return WatermarkFunctions
 	end
-
 
 	-- InitNotifications
 
@@ -547,7 +575,10 @@ function library:Init(Config)
 		barLayout.Parent = barFolder
 		barLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-		backgroundGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28))}
+		backgroundGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)),
+			ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28)),
+		})
 		backgroundGradient.Rotation = 90
 		backgroundGradient.Parent = background
 
@@ -576,31 +607,59 @@ function library:Init(Config)
 		backgroundLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		backgroundLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 
-		local NewSize = TextService:GetTextSize(notifText.Text, notifText.TextSize, notifText.Font, Vector2.new(math.huge, math.huge))
+		local NewSize = TextService:GetTextSize(
+			notifText.Text,
+			notifText.TextSize,
+			notifText.Font,
+			Vector2.new(math.huge, math.huge)
+		)
 		TweenWrapper:CreateStyle("notification_wait", duration, Enum.EasingStyle.Quad)
 		local IsRunning = false
 		coroutine.wrap(function()
 			IsRunning = true
-			TweenService:Create(edge, TweenWrapper.Styles["notification_load"], {BackgroundTransparency = 0}):Play()
-			TweenService:Create(background, TweenWrapper.Styles["notification_load"], {BackgroundTransparency = 0}):Play()
-			TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], {TextTransparency = 0}):Play()
-			TweenService:Create(edge, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, NewSize.X + 10, 0, 26)}):Play()
-			TweenService:Create(background, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, NewSize.X + 8, 0, 24)}):Play()
-			TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, NewSize.X + 8, 0, 24)}):Play()
+			TweenService:Create(edge, TweenWrapper.Styles["notification_load"], { BackgroundTransparency = 0 }):Play()
+			TweenService:Create(background, TweenWrapper.Styles["notification_load"], { BackgroundTransparency = 0 })
+				:Play()
+			TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], { TextTransparency = 0 }):Play()
+			TweenService
+				:Create(edge, TweenWrapper.Styles["notification_load"], { Size = UDim2.new(0, NewSize.X + 10, 0, 26) })
+				:Play()
+			TweenService
+				:Create(
+					background,
+					TweenWrapper.Styles["notification_load"],
+					{ Size = UDim2.new(0, NewSize.X + 8, 0, 24) }
+				)
+				:Play()
+			TweenService
+				:Create(
+					notifText,
+					TweenWrapper.Styles["notification_load"],
+					{ Size = UDim2.new(0, NewSize.X + 8, 0, 24) }
+				)
+				:Play()
 			wait()
-			local Tween = TweenService:Create(bar, TweenWrapper.Styles["notification_wait"], {Size = UDim2.new(0, NewSize.X + 8, 0, 1)})
+			local Tween = TweenService:Create(
+				bar,
+				TweenWrapper.Styles["notification_wait"],
+				{ Size = UDim2.new(0, NewSize.X + 8, 0, 1) }
+			)
 			Tween:Play()
 			Tween.Completed:Wait()
 			IsRunning = false
-			TweenService:Create(edge, TweenWrapper.Styles["notification_load"], {BackgroundTransparency = 1}):Play()
-			TweenService:Create(background, TweenWrapper.Styles["notification_load"], {BackgroundTransparency = 1}):Play()
-			TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], {TextTransparency = 1}):Play()
-			TweenService:Create(bar, TweenWrapper.Styles["notification_load"], {BackgroundTransparency = 1}):Play()
-			TweenService:Create(edge, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, 0, 0, 26)}):Play()
-			TweenService:Create(background, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, 0, 0, 24)}):Play()
-			TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, 0, 0, 24)}):Play()
-			TweenService:Create(bar, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, 0, 0, 1)}):Play()
-			wait(.2)
+			TweenService:Create(edge, TweenWrapper.Styles["notification_load"], { BackgroundTransparency = 1 }):Play()
+			TweenService:Create(background, TweenWrapper.Styles["notification_load"], { BackgroundTransparency = 1 })
+				:Play()
+			TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], { TextTransparency = 1 }):Play()
+			TweenService:Create(bar, TweenWrapper.Styles["notification_load"], { BackgroundTransparency = 1 }):Play()
+			TweenService:Create(edge, TweenWrapper.Styles["notification_load"], { Size = UDim2.new(0, 0, 0, 26) })
+				:Play()
+			TweenService:Create(background, TweenWrapper.Styles["notification_load"], { Size = UDim2.new(0, 0, 0, 24) })
+				:Play()
+			TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], { Size = UDim2.new(0, 0, 0, 24) })
+				:Play()
+			TweenService:Create(bar, TweenWrapper.Styles["notification_load"], { Size = UDim2.new(0, 0, 0, 1) }):Play()
+			wait(0.2)
 			edge:Destroy()
 		end)()
 
@@ -610,16 +669,38 @@ function library:Init(Config)
 			new = new or text
 			notifText.Text = new
 
-			NewSize = TextService:GetTextSize(notifText.Text, notifText.TextSize, notifText.Font, Vector2.new(math.huge, math.huge))
+			NewSize = TextService:GetTextSize(
+				notifText.Text,
+				notifText.TextSize,
+				notifText.Font,
+				Vector2.new(math.huge, math.huge)
+			)
 			local NewSize_2 = NewSize
 			if IsRunning then
-				TweenService:Create(edge, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, NewSize.X + 10, 0, 26)}):Play()
-				TweenService:Create(background, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, NewSize.X + 8, 0, 24)}):Play()
-				TweenService:Create(notifText, TweenWrapper.Styles["notification_load"], {Size = UDim2.new(0, NewSize.X + 8, 0, 24)}):Play()
+				TweenService
+					:Create(
+						edge,
+						TweenWrapper.Styles["notification_load"],
+						{ Size = UDim2.new(0, NewSize.X + 10, 0, 26) }
+					)
+					:Play()
+				TweenService:Create(
+					background,
+					TweenWrapper.Styles["notification_load"],
+					{ Size = UDim2.new(0, NewSize.X + 8, 0, 24) }
+				):Play()
+				TweenService:Create(
+					notifText,
+					TweenWrapper.Styles["notification_load"],
+					{ Size = UDim2.new(0, NewSize.X + 8, 0, 24) }
+				):Play()
 				wait()
-				TweenService:Create(bar, TweenWrapper.Styles["notification_reset"], {Size = UDim2.new(0, 0, 0, 1)}):Play()
-				wait(.4)
-				TweenService:Create(bar, TweenWrapper.Styles["notification_wait"], {Size = UDim2.new(0, NewSize.X + 8, 0, 1)}):Play()
+				TweenService:Create(bar, TweenWrapper.Styles["notification_reset"], { Size = UDim2.new(0, 0, 0, 1) })
+					:Play()
+				wait(0.4)
+				TweenService
+					:Create(bar, TweenWrapper.Styles["notification_wait"], { Size = UDim2.new(0, NewSize.X + 8, 0, 1) })
+					:Play()
 			end
 
 			return self
@@ -657,7 +738,10 @@ function library:Init(Config)
 	IntroStroke.Transparency = 1
 
 	local backgroundGradient = Instance.new("UIGradient", background)
-	backgroundGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28))}
+	backgroundGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)),
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28)),
+	})
 	backgroundGradient.Rotation = 90
 
 	local backgroundCorner = Instance.new("UICorner", background)
@@ -678,7 +762,10 @@ function library:Init(Config)
 	Logo.TextColor3 = library.acientColor
 	Logo.TextSize = 100.000
 
-	backgroundGradient_2.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(171, 171, 171))}
+	backgroundGradient_2.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(171, 171, 171)),
+	})
 	backgroundGradient_2.Rotation = 90
 	backgroundGradient_2.Parent = Logo
 
@@ -726,7 +813,10 @@ function library:Init(Config)
 	LogExample.TextXAlignment = Enum.TextXAlignment.Left
 	LogExample.TextYAlignment = Enum.TextYAlignment.Top
 
-	backgroundGradient_3.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(171, 171, 171))}
+	backgroundGradient_3.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(171, 171, 171)),
+	})
 	backgroundGradient_3.Rotation = 90
 	backgroundGradient_3.Parent = LogExample
 
@@ -735,31 +825,31 @@ function library:Init(Config)
 	pageLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	pageLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 
-	TweenWrapper:CreateStyle("introduction",0.175)
-	TweenWrapper:CreateStyle("introduction end",0.5)
+	TweenWrapper:CreateStyle("introduction", 0.175)
+	TweenWrapper:CreateStyle("introduction end", 0.5)
 
 	function library:BeginIntroduction()
 		Logo.Text = library.company:sub(1, 1):upper()
 
 		--TweenService:Create(edge, TweenWrapper.Styles["introduction"], {BackgroundTransparency = 0}):Play()
-		TweenService:Create(background, TweenWrapper.Styles["introduction"], {BackgroundTransparency = 0}):Play()
-		wait(.2)
-		TweenService:Create(IntroStroke, TweenWrapper.Styles["introduction end"], {Transparency = 0.55}):Play()
-		TweenService:Create(bar, TweenWrapper.Styles["introduction"], {BackgroundTransparency = 0.2}):Play()
-		wait(.3)
-		TweenService:Create(Logo, TweenWrapper.Styles["introduction"], {TextTransparency = 0}):Play()
+		TweenService:Create(background, TweenWrapper.Styles["introduction"], { BackgroundTransparency = 0 }):Play()
+		wait(0.2)
+		TweenService:Create(IntroStroke, TweenWrapper.Styles["introduction end"], { Transparency = 0.55 }):Play()
+		TweenService:Create(bar, TweenWrapper.Styles["introduction"], { BackgroundTransparency = 0.2 }):Play()
+		wait(0.3)
+		TweenService:Create(Logo, TweenWrapper.Styles["introduction"], { TextTransparency = 0 }):Play()
 
 		wait(2)
 
-		local LogoTween = TweenService:Create(Logo, TweenWrapper.Styles["introduction"], {TextTransparency = 1})
-		TweenService:Create(Logo, TweenInfo.new(1), {TextSize = 0}):Play()
+		local LogoTween = TweenService:Create(Logo, TweenWrapper.Styles["introduction"], { TextTransparency = 1 })
+		TweenService:Create(Logo, TweenInfo.new(1), { TextSize = 0 }):Play()
 		LogoTween:Play()
 		LogoTween.Completed:Wait()
 	end
 
 	function library:AddIntroductionMessage(Message)
 		if messages.BackgroundTransparency >= 1 then
-			TweenService:Create(messages, TweenInfo.new(.2), {BackgroundTransparency = 0.55}):Play()
+			TweenService:Create(messages, TweenInfo.new(0.2), { BackgroundTransparency = 0.55 }):Play()
 		end
 
 		local Log = LogExample:Clone()
@@ -767,28 +857,28 @@ function library:Init(Config)
 		Log.Parent = messages
 		Log.Text = Message
 		Log.TextTransparency = 1
-		Log.TextSize = OrginalSize*0.9
+		Log.TextSize = OrginalSize * 0.9
 		Log.Visible = true
-		TweenService:Create(Log, TweenInfo.new(1), {TextTransparency = 0}):Play()
-		TweenService:Create(Log, TweenInfo.new(.7), {TextSize = OrginalSize}):Play()
-		wait(.1)
+		TweenService:Create(Log, TweenInfo.new(1), { TextTransparency = 0 }):Play()
+		TweenService:Create(Log, TweenInfo.new(0.7), { TextSize = OrginalSize }):Play()
+		wait(0.1)
 		return Log
 	end
 
 	function library:EndIntroduction(Message)
 		for _, Message in next, messages:GetChildren() do
 			pcall(function()
-				TweenService:Create(Message, TweenWrapper.Styles["introduction end"], {TextTransparency = 1}):Play()
+				TweenService:Create(Message, TweenWrapper.Styles["introduction end"], { TextTransparency = 1 }):Play()
 			end)
 		end
 		wait(0.2)
 
-		TweenService:Create(messages, TweenWrapper.Styles["introduction end"], {BackgroundTransparency = 1}):Play()
+		TweenService:Create(messages, TweenWrapper.Styles["introduction end"], { BackgroundTransparency = 1 }):Play()
 		--TweenService:Create(edge, TweenWrapper.Styles["introduction end"], {BackgroundTransparency = 1}):Play()
-		TweenService:Create(background, TweenWrapper.Styles["introduction end"], {BackgroundTransparency = 1}):Play()
-		TweenService:Create(bar, TweenWrapper.Styles["introduction end"], {BackgroundTransparency = 1}):Play()
-		TweenService:Create(Logo, TweenWrapper.Styles["introduction end"], {TextTransparency = 1}):Play()
-		TweenService:Create(IntroStroke, TweenWrapper.Styles["introduction end"], {Transparency = 1}):Play()
+		TweenService:Create(background, TweenWrapper.Styles["introduction end"], { BackgroundTransparency = 1 }):Play()
+		TweenService:Create(bar, TweenWrapper.Styles["introduction end"], { BackgroundTransparency = 1 }):Play()
+		TweenService:Create(Logo, TweenWrapper.Styles["introduction end"], { TextTransparency = 1 }):Play()
+		TweenService:Create(IntroStroke, TweenWrapper.Styles["introduction end"], { Transparency = 1 }):Play()
 	end
 
 	----/// UI INIT
@@ -806,7 +896,7 @@ function library:Init(Config)
 	background.Size = UDim2.fromOffset(594, 406)
 	background.ClipsDescendants = true
 	EnableDrag(background, 0.1)
-	
+
 	local SizeConstraint = Instance.new("UISizeConstraint")
 	SizeConstraint.Parent = background
 	SizeConstraint.MaxSize = Vector2.new(594, 406)
@@ -819,7 +909,10 @@ function library:Init(Config)
 	BGStroke.Transparency = 0.55
 
 	local BGGradient = Instance.new("UIGradient", background)
-	BGGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(230, 230, 230))}
+	BGGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(230, 230, 230)),
+	})
 	BGGradient.Rotation = 90
 
 	--/ Tabs
@@ -866,7 +959,7 @@ function library:Init(Config)
 	company.TextColor3 = library.companyColor
 	company.TextSize = 16.000
 	company.TextTransparency = 0.300
- company.RichText = true
+	company.RichText = true
 	company.TextXAlignment = Enum.TextXAlignment.Left
 
 	function library:SetCompany(text)
@@ -883,7 +976,7 @@ function library:Init(Config)
 	headerLabel.Size = UDim2.new(1, 0, 1, 0)
 	headerLabel.Font = library.Font
 	headerLabel.Text = ""
- headerLabel.RichText = true
+	headerLabel.RichText = true
 	headerLabel.TextColor3 = Color3.fromRGB(198, 198, 198)
 	headerLabel.TextSize = 16.000
 	headerLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -923,7 +1016,10 @@ function library:Init(Config)
 	tabButtonsOutline.Color = library.lightGray
 
 	local tabButtonsGradient = Instance.new("UIGradient", tabButtons)
-	tabButtonsGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28))}
+	tabButtonsGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)),
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28)),
+	})
 	tabButtonsGradient.Rotation = 90
 
 	local containerCorner = Instance.new("UICorner")
@@ -961,7 +1057,9 @@ function library:Init(Config)
 	--end)
 
 	UserInputService.InputBegan:Connect(function(input) -- Toggle UI
-		if input.KeyCode ~= library.Key then return end
+		if input.KeyCode ~= library.Key then
+			return
+		end
 
 		local Visible = not background.Visible
 		library:ShowUI(Visible)
@@ -975,13 +1073,13 @@ function library:Init(Config)
 		local Tweeninfo = TweenInfo.new(Visible and 0.5 or 0.3)
 
 		background.Visible = Visible
-		
+
 		if BlurEffect then
 			TweenService:Create(Blur, Tweeninfo, {
-				Size = Visible and BlurSize or 0
+				Size = Visible and BlurSize or 0,
 			}):Play()
 			TweenService:Create(CurrentCam, Tweeninfo, {
-				FieldOfView = Visible and FieldOfView-12 or FieldOfView
+				FieldOfView = Visible and FieldOfView - 12 or FieldOfView,
 			}):Play()
 		end
 
@@ -990,7 +1088,7 @@ function library:Init(Config)
 
 	local TabLibrary = {
 		IsFirst = true,
-		CurrentTab = ""
+		CurrentTab = "",
 	}
 	TweenWrapper:CreateStyle("tab_text_colour", 0.16)
 	function library:NewTab(title)
@@ -1026,7 +1124,7 @@ function library:Init(Config)
 		page.TopImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
 		page.ScrollBarImageColor3 = library.acientColor
 		page.Visible = false
-		page.CanvasSize = UDim2.new(0,0,0,0)
+		page.CanvasSize = UDim2.new(0, 0, 0, 0)
 		page.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
 		pageLayout.Parent = page
@@ -1040,27 +1138,35 @@ function library:Init(Config)
 		pagePadding.PaddingRight = UDim.new(0, 6)
 		pagePadding.PaddingTop = UDim.new(0, 6)
 
-		if self.IsFirst then
+		if self.IsFirst or title == "Movement" then -- Show Movement tab by default
 			page.Visible = true
 			tabButton.TextColor3 = library.acientColor
 			self.CurrentTab = title
+			self.IsFirst = false -- Set IsFirst to false after showing the Movement tab
 		end
 
 		tabButton.MouseButton1Click:Connect(function()
 			self.CurrentTab = title
-			for i,v in pairs(container:GetChildren()) do 
+			for i, v in pairs(container:GetChildren()) do
 				if v:IsA("ScrollingFrame") then
 					v.Visible = false
 				end
 			end
 			page.Visible = true
 
-			for i,v in pairs(tabButtons:GetChildren()) do
+			for i, v in pairs(tabButtons:GetChildren()) do
 				if v:IsA("TextButton") then
-					TweenService:Create(v, TweenWrapper.Styles["tab_text_colour"], {TextColor3 = Color3.fromRGB(170, 170, 170)}):Play()
+					TweenService
+						:Create(
+							v,
+							TweenWrapper.Styles["tab_text_colour"],
+							{ TextColor3 = Color3.fromRGB(170, 170, 170) }
+						)
+						:Play()
 				end
 			end
-			TweenService:Create(tabButton, TweenWrapper.Styles["tab_text_colour"], {TextColor3 = library.acientColor}):Play()
+			TweenService:Create(tabButton, TweenWrapper.Styles["tab_text_colour"], { TextColor3 = library.acientColor })
+				:Play()
 		end)
 
 		self.IsFirst = false
@@ -1100,8 +1206,6 @@ function library:Init(Config)
 			elseif alignment:lower():find("ri") then
 				label.TextXAlignment = Enum.TextXAlignment.Right
 			end
-
-
 
 			local LabelFunctions = {}
 			function LabelFunctions:SetText(text)
@@ -1169,17 +1273,21 @@ function library:Init(Config)
 			buttonCorner.CornerRadius = UDim.new(0, 2)
 
 			button.MouseEnter:Connect(function()
-				TweenService:Create(button, TweenWrapper.Styles["hover"], {BackgroundColor3 = Hover}):Play()
+				TweenService:Create(button, TweenWrapper.Styles["hover"], { BackgroundColor3 = Hover }):Play()
 			end)
 			button.MouseLeave:Connect(function()
-				TweenService:Create(button, TweenWrapper.Styles["hover"], {BackgroundColor3 = Color}):Play()
+				TweenService:Create(button, TweenWrapper.Styles["hover"], { BackgroundColor3 = Color }):Play()
 			end)
 
 			button.MouseButton1Down:Connect(function()
-				TweenService:Create(button, TweenWrapper.Styles["hover"], {TextColor3 = Color3.fromRGB(169, 107, 255)}):Play()
+				TweenService
+					:Create(button, TweenWrapper.Styles["hover"], { TextColor3 = Color3.fromRGB(169, 107, 255) })
+					:Play()
 			end)
 			button.MouseButton1Up:Connect(function()
-				TweenService:Create(button, TweenWrapper.Styles["hover"], {TextColor3 = Color3.fromRGB(125, 125, 125)}):Play()
+				TweenService
+					:Create(button, TweenWrapper.Styles["hover"], { TextColor3 = Color3.fromRGB(125, 125, 125) })
+					:Play()
 			end)
 
 			button.MouseButton1Click:Connect(function()
@@ -1249,7 +1357,7 @@ function library:Init(Config)
 			sectionLayout.Padding = UDim.new(0, 4)
 
 			sectionLabel.Parent = sectionFrame
-			sectionLabel.BackgroundColor3 = library.headerColor 
+			sectionLabel.BackgroundColor3 = library.headerColor
 			sectionLabel.BackgroundTransparency = 1.000
 			sectionLabel.ClipsDescendants = true
 			sectionLabel.Position = UDim2.new(0.0252525248, 0, 0.020833334, 0)
@@ -1262,8 +1370,12 @@ function library:Init(Config)
 			sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
 			sectionLabel.RichText = true
 
-
-			local NewSectionSize = TextService:GetTextSize(sectionLabel.Text, sectionLabel.TextSize, sectionLabel.Font, Vector2.new(math.huge,math.huge))
+			local NewSectionSize = TextService:GetTextSize(
+				sectionLabel.Text,
+				sectionLabel.TextSize,
+				sectionLabel.Font,
+				Vector2.new(math.huge, math.huge)
+			)
 			sectionLabel.Size = UDim2.new(0, NewSectionSize.X, 0, 18)
 
 			local SectionFunctions = {}
@@ -1271,7 +1383,12 @@ function library:Init(Config)
 				new = new or text
 				sectionLabel.Text = new
 
-				local NewSectionSize = TextService:GetTextSize(sectionLabel.Text, sectionLabel.TextSize, sectionLabel.Font, Vector2.new(math.huge,math.huge))
+				local NewSectionSize = TextService:GetTextSize(
+					sectionLabel.Text,
+					sectionLabel.TextSize,
+					sectionLabel.Font,
+					Vector2.new(math.huge, math.huge)
+				)
 				sectionLabel.Size = UDim2.new(0, NewSectionSize.X, 0, 18)
 
 				return self
@@ -1370,14 +1487,23 @@ function library:Init(Config)
 			ExtrasLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 			ExtrasLayout.Padding = UDim.new(0, 2)
 
-			local NewToggleLabelSize = TextService:GetTextSize(toggleLabel.Text, toggleLabel.TextSize, toggleLabel.Font, Vector2.new(math.huge,math.huge))
+			local NewToggleLabelSize = TextService:GetTextSize(
+				toggleLabel.Text,
+				toggleLabel.TextSize,
+				toggleLabel.Font,
+				Vector2.new(math.huge, math.huge)
+			)
 			toggleLabel.Size = UDim2.new(0, NewToggleLabelSize.X + 6, 0, 22)
 
 			toggleButton.MouseEnter:Connect(function()
-				TweenService:Create(toggleLabel, TweenWrapper.Styles["hover"], {TextColor3 = Color3.fromRGB(210, 210, 210)}):Play()
+				TweenService
+					:Create(toggleLabel, TweenWrapper.Styles["hover"], { TextColor3 = Color3.fromRGB(210, 210, 210) })
+					:Play()
 			end)
 			toggleButton.MouseLeave:Connect(function()
-				TweenService:Create(toggleLabel, TweenWrapper.Styles["hover"], {TextColor3 = Color3.fromRGB(190, 190, 190)}):Play()
+				TweenService
+					:Create(toggleLabel, TweenWrapper.Styles["hover"], { TextColor3 = Color3.fromRGB(190, 190, 190) })
+					:Play()
 			end)
 
 			TweenWrapper:CreateStyle("toggle_form", 0.13)
@@ -1400,15 +1526,17 @@ function library:Init(Config)
 				On = not On
 				local SizeOn = On and UDim2.new(0, 12, 0, 12) or UDim2.new(0, 0, 0, 0)
 				local Transparency = On and 0 or 1
-				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {Size = SizeOn}):Play()
-				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {BackgroundTransparency = Transparency}):Play()
+				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], { Size = SizeOn }):Play()
+				TweenService
+					:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], { BackgroundTransparency = Transparency })
+					:Play()
 				callback(On)
 			end)
 
 			local ToggleFunctions = {}
 
 			if not ignorepanic then
-				OptionStates[toggleButton] = {false, ToggleFunctions}
+				OptionStates[toggleButton] = { false, ToggleFunctions }
 			end
 
 			function ToggleFunctions:SetText(new)
@@ -1425,14 +1553,16 @@ function library:Init(Config)
 			function ToggleFunctions:Show()
 				toggleButton.Visible = true
 				return self
-			end   
+			end
 
 			function ToggleFunctions:Change()
 				On = not On
 				local SizeOn = On and UDim2.new(0, 12, 0, 12) or UDim2.new(0, 0, 0, 0)
 				local Transparency = On and 0 or 1
-				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {Size = SizeOn}):Play()
-				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {BackgroundTransparency = Transparency}):Play()
+				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], { Size = SizeOn }):Play()
+				TweenService
+					:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], { BackgroundTransparency = Transparency })
+					:Play()
 				callback(On)
 				return self
 			end
@@ -1446,8 +1576,10 @@ function library:Init(Config)
 				On = state
 				local SizeOn = On and UDim2.new(0, 12, 0, 12) or UDim2.new(0, 0, 0, 0)
 				local Transparency = On and 0 or 1
-				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {Size = SizeOn}):Play()
-				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {BackgroundTransparency = Transparency}):Play()
+				TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], { Size = SizeOn }):Play()
+				TweenService
+					:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], { BackgroundTransparency = Transparency })
+					:Play()
 				callback(On)
 				return ToggleFunctions
 			end
@@ -1464,7 +1596,6 @@ function library:Init(Config)
 				return ToggleFunctions
 			end
 
-
 			function ToggleFunctions:AddKeybind(default_t)
 				callback_t = callback
 				if default_t == Enum.KeyCode.Backspace then
@@ -1480,12 +1611,12 @@ function library:Init(Config)
 				local keybindLabelStraint = Instance.new("UISizeConstraint")
 				local keybindBackgroundStraint = Instance.new("UISizeConstraint")
 				local keybindStraint = Instance.new("UISizeConstraint")
-				
+
 				keybindOutline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				keybindOutline.Thickness = 1
 				keybindOutline.Parent = keybind
 				keybindOutline.Color = library.lightGray
-				
+
 				keybindCorner.CornerRadius = UDim.new(0, 2)
 				keybindCorner.Parent = keybind
 
@@ -1534,33 +1665,56 @@ function library:Init(Config)
 				keybindStraint.MinSize = Vector2.new(30, 22)
 
 				local Shortcuts = {
-					Return = "enter"
+					Return = "enter",
 				}
 
 				keybindButtonLabel.Text = default_t and (Shortcuts[default_t.Name] or default_t.Name) or "None"
 				TweenWrapper:CreateStyle("keybind", 0.08)
 
-				local NewKeybindSize = TextService:GetTextSize(keybindButtonLabel.Text, keybindButtonLabel.TextSize, keybindButtonLabel.Font, Vector2.new(math.huge,math.huge))
+				local NewKeybindSize = TextService:GetTextSize(
+					keybindButtonLabel.Text,
+					keybindButtonLabel.TextSize,
+					keybindButtonLabel.Font,
+					Vector2.new(math.huge, math.huge)
+				)
 				keybindButtonLabel.Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)
 				keybindBackground.Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)
 				keybind.Size = UDim2.new(0, NewKeybindSize.X + 8, 0, 22)
 
 				local function ResizeKeybind()
-					NewKeybindSize = TextService:GetTextSize(keybindButtonLabel.Text, keybindButtonLabel.TextSize, keybindButtonLabel.Font, Vector2.new(math.huge,math.huge))
-					TweenService:Create(keybindButtonLabel, TweenWrapper.Styles["keybind"], {Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)}):Play()
-					TweenService:Create(keybindBackground, TweenWrapper.Styles["keybind"], {Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)}):Play()
-					TweenService:Create(keybind, TweenWrapper.Styles["keybind"], {Size = UDim2.new(0, NewKeybindSize.X + 8, 0, 22)}):Play()
+					NewKeybindSize = TextService:GetTextSize(
+						keybindButtonLabel.Text,
+						keybindButtonLabel.TextSize,
+						keybindButtonLabel.Font,
+						Vector2.new(math.huge, math.huge)
+					)
+					TweenService:Create(
+						keybindButtonLabel,
+						TweenWrapper.Styles["keybind"],
+						{ Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20) }
+					):Play()
+					TweenService:Create(
+						keybindBackground,
+						TweenWrapper.Styles["keybind"],
+						{ Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20) }
+					):Play()
+					TweenService:Create(
+						keybind,
+						TweenWrapper.Styles["keybind"],
+						{ Size = UDim2.new(0, NewKeybindSize.X + 8, 0, 22) }
+					):Play()
 				end
 				keybindButtonLabel:GetPropertyChangedSignal("Text"):Connect(ResizeKeybind)
 				ResizeKeybind()
-
 
 				local ChosenKey = default_t and default_t.Name
 
 				keybind.MouseButton1Click:Connect(function()
 					keybindButtonLabel.Text = ". . ."
 					local InputWait = UserInputService.InputBegan:wait()
-					if not UserInputService.WindowFocused then return end 
+					if not UserInputService.WindowFocused then
+						return
+					end
 
 					if InputWait == Enum.KeyCode.Backspace then
 						default_t = nil
@@ -1584,8 +1738,13 @@ function library:Init(Config)
 								On = not On
 								local SizeOn = On and UDim2.new(0, 12, 0, 12) or UDim2.new(0, 0, 0, 0)
 								local Transparency = On and 0 or 1
-								TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {Size = SizeOn}):Play()
-								TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], {BackgroundTransparency = Transparency}):Play()
+								TweenService:Create(toggleDesign, TweenWrapper.Styles["toggle_form"], { Size = SizeOn })
+									:Play()
+								TweenService:Create(
+									toggleDesign,
+									TweenWrapper.Styles["toggle_form"],
+									{ BackgroundTransparency = Transparency }
+								):Play()
 								callback_t(On)
 								return
 							end
@@ -1609,7 +1768,7 @@ function library:Init(Config)
 				function ExtraKeybindFunctions:SetFunction(new)
 					new = new or function() end
 					callback_t = new
-					return self 
+					return self
 				end
 
 				function ExtraKeybindFunctions:Hide()
@@ -1723,7 +1882,10 @@ function library:Init(Config)
 			keybindBackground.Position = UDim2.new(0.5, 0, 0.5, 0)
 			keybindBackground.Size = UDim2.new(0, 85, 0, 20)
 
-			keybindGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28))}
+			keybindGradient.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(34, 34, 34)),
+				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(28, 28, 28)),
+			})
 			keybindGradient.Rotation = 90
 			keybindGradient.Parent = keybindBackground
 
@@ -1753,22 +1915,48 @@ function library:Init(Config)
 			keybindStraint.MinSize = Vector2.new(30, 22)
 
 			local Shortcuts = {
-				Return = "enter"
+				Return = "enter",
+				Unknown = "None",
+				Backspace = "None",
 			}
 
 			keybindButtonLabel.Text = Shortcuts[default.Name] or default.Name
 			TweenWrapper:CreateStyle("keybind", 0.08)
 
-			local NewKeybindSize = TextService:GetTextSize(keybindButtonLabel.Text, keybindButtonLabel.TextSize, keybindButtonLabel.Font, Vector2.new(math.huge,math.huge))
+			local NewKeybindSize = TextService:GetTextSize(
+				keybindButtonLabel.Text,
+				keybindButtonLabel.TextSize,
+				keybindButtonLabel.Font,
+				Vector2.new(math.huge, math.huge)
+			)
 			keybindButtonLabel.Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)
 			keybindBackground.Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)
 			keybind.Size = UDim2.new(0, NewKeybindSize.X + 8, 0, 22)
 
 			local function ResizeKeybind()
-				NewKeybindSize = TextService:GetTextSize(keybindButtonLabel.Text, keybindButtonLabel.TextSize, keybindButtonLabel.Font, Vector2.new(math.huge,math.huge))
-				TweenService:Create(keybindButtonLabel, TweenWrapper.Styles["keybind"], {Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)}):Play()
-				TweenService:Create(keybindBackground, TweenWrapper.Styles["keybind"], {Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20)}):Play()
-				TweenService:Create(keybind, TweenWrapper.Styles["keybind"], {Size = UDim2.new(0, NewKeybindSize.X + 8, 0, 22)}):Play()
+				NewKeybindSize = TextService:GetTextSize(
+					keybindButtonLabel.Text,
+					keybindButtonLabel.TextSize,
+					keybindButtonLabel.Font,
+					Vector2.new(math.huge, math.huge)
+				)
+				TweenService:Create(
+					keybindButtonLabel,
+					TweenWrapper.Styles["keybind"],
+					{ Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20) }
+				):Play()
+				TweenService:Create(
+					keybindBackground,
+					TweenWrapper.Styles["keybind"],
+					{ Size = UDim2.new(0, NewKeybindSize.X + 6, 0, 20) }
+				):Play()
+				TweenService
+					:Create(
+						keybind,
+						TweenWrapper.Styles["keybind"],
+						{ Size = UDim2.new(0, NewKeybindSize.X + 8, 0, 22) }
+					)
+					:Play()
 			end
 			keybindButtonLabel:GetPropertyChangedSignal("Text"):Connect(ResizeKeybind)
 			ResizeKeybind()
@@ -1807,8 +1995,6 @@ function library:Init(Config)
 				end)
 			end
 
-
-
 			local KeybindFunctions = {}
 			function KeybindFunctions:Fire()
 				callback(ChosenKey)
@@ -1818,7 +2004,7 @@ function library:Init(Config)
 			function KeybindFunctions:SetFunction(new)
 				new = new or function() end
 				callback = new
-				return self 
+				return self
 			end
 
 			function KeybindFunctions:SetKey(new)
@@ -1930,7 +2116,6 @@ function library:Init(Config)
 			textBoxValuesPadding.PaddingTop = UDim.new(0, 4)
 
 			TweenWrapper:CreateStyle("TextBox", 0.07)
-
 
 			textBoxValues.FocusLost:Connect(function(enterPressed)
 				if autoexec or enterPressed then
@@ -2126,17 +2311,16 @@ function library:Init(Config)
 
 			TweenWrapper:CreateStyle("selector", 0.08)
 
-
 			local Amount = #list
 			local Val = (Amount * 20)
-			local Size= 0
+			local Size = 0
 
 			local function checkSizes()
 				Amount = #list
 				Val = (Amount * 20) + 20
 			end
 
-			for i,v in next, list do
+			for i, v in next, list do
 				local optionButton = Instance.new("TextButton")
 
 				optionButton.Name = "optionButton"
@@ -2155,22 +2339,28 @@ function library:Init(Config)
 				end
 
 				optionButton.MouseButton1Click:Connect(function()
-					for z,x in next, selectorContainer:GetChildren() do
+					for z, x in next, selectorContainer:GetChildren() do
 						if x:IsA("TextButton") then
-							TweenService:Create(x, TweenWrapper.Styles["selector"], {TextColor3 = Color3.fromRGB(160, 160, 160)}):Play()
+							TweenService
+								:Create(
+									x,
+									TweenWrapper.Styles["selector"],
+									{ TextColor3 = Color3.fromRGB(160, 160, 160) }
+								)
+								:Play()
 						end
 					end
-					TweenService:Create(optionButton, TweenWrapper.Styles["selector"], {TextColor3 = library.acientColor}):Play()
+					TweenService
+						:Create(optionButton, TweenWrapper.Styles["selector"], { TextColor3 = library.acientColor })
+						:Play()
 					selectorText.Text = optionButton.Text
 					callback(optionButton.Text)
 				end)
 
 				Size = Val + 2
 
-
 				checkSizes()
 			end
-
 
 			local SelectorFunctions = {}
 			local AddAmount = 0
@@ -2181,13 +2371,13 @@ function library:Init(Config)
 				IsOpen = not IsOpen
 
 				TweenService:Create(selector, TweenInfo.new(Speed), {
-					Size = UDim2.new(1, 0, 0, IsOpen and Size or 23)
+					Size = UDim2.new(1, 0, 0, IsOpen and Size or 23),
 				}):Play()
 				TweenService:Create(selectorFrame, TweenInfo.new(Speed), {
-					Size = UDim2.new(0, 394, 0, IsOpen and Size+24 or 48)
+					Size = UDim2.new(0, 394, 0, IsOpen and Size + 24 or 48),
 				}):Play()
 				TweenService:Create(Toggle, TweenInfo.new(Speed), {
-					Rotation = IsOpen and -90 or 90
+					Rotation = IsOpen and -90 or 90,
 				}):Play()
 			end
 
@@ -2218,19 +2408,26 @@ function library:Init(Config)
 				end
 
 				optionButton.MouseButton1Click:Connect(function()
-					for z,x in next, selectorContainer:GetChildren() do
+					for z, x in next, selectorContainer:GetChildren() do
 						if x:IsA("TextButton") then
-							TweenService:Create(x, TweenWrapper.Styles["selector"], {TextColor3 = Color3.fromRGB(140, 140, 140)}):Play()
+							TweenService
+								:Create(
+									x,
+									TweenWrapper.Styles["selector"],
+									{ TextColor3 = Color3.fromRGB(140, 140, 140) }
+								)
+								:Play()
 						end
 					end
-					TweenService:Create(optionButton, TweenWrapper.Styles["selector"], {TextColor3 = library.acientColor}):Play()
+					TweenService
+						:Create(optionButton, TweenWrapper.Styles["selector"], { TextColor3 = library.acientColor })
+						:Play()
 					selectorText.Text = optionButton.Text
 					callback(optionButton.Text)
 				end)
 
 				checkSizes()
 				Size = (Val + AddAmount) + 2
-
 
 				checkSizes()
 				return self
@@ -2243,7 +2440,7 @@ function library:Init(Config)
 				RemoveAmount = RemoveAmount + 20
 				AddAmount = AddAmount - 20
 
-				for i,v in next, selectorContainer:GetDescendants() do
+				for i, v in next, selectorContainer:GetDescendants() do
 					if v:IsA("TextButton") then
 						if v.Text == option then
 							v:Destroy()
@@ -2255,7 +2452,6 @@ function library:Init(Config)
 				if selectorText.Text == option then
 					selectorText.Text = ". . ."
 				end
-
 
 				checkSizes()
 				return self
@@ -2295,11 +2491,12 @@ function library:Init(Config)
 			suffix = suffix or ""
 			compare = compare or false
 			compareSign = compareSign or "/"
-			values = values or {
-				min = values.min or 0,
-				max = values.max or 100,
-				default = values.default or 0
-			}
+			values = values
+				or {
+					min = values.min or 0,
+					max = values.max or 100,
+					default = values.default or 0,
+				}
 			callback = callback or function() end
 
 			values.max = values.max + 1
@@ -2323,7 +2520,7 @@ function library:Init(Config)
 			local sliderValue = Instance.new("TextLabel")
 
 			sliderFrame.Parent = page
-			sliderFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+			sliderFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 			sliderFrame.BackgroundTransparency = 1.000
 			sliderFrame.ClipsDescendants = true
 			sliderFrame.Position = UDim2.new(0.00499999989, 0, 0.667630076, 0)
@@ -2375,7 +2572,10 @@ function library:Init(Config)
 			sliderIndicatorStraint.Parent = sliderIndicator
 			sliderIndicatorStraint.MaxSize = Vector2.new(392, 12)
 
-			sliderIndicatorGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255,255,255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(181, 181, 181))}
+			sliderIndicatorGradient.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(181, 181, 181)),
+			})
 			sliderIndicatorGradient.Rotation = 90
 			sliderIndicatorGradient.Parent = sliderIndicator
 
@@ -2421,7 +2621,6 @@ function library:Init(Config)
 			sliderValue.TextSize = 14.000
 			sliderValue.TextXAlignment = Enum.TextXAlignment.Right
 
-
 			local calc1 = values.max - values.min
 			local calc2 = values.default - values.min
 			local calc3 = calc2 / calc1
@@ -2432,14 +2631,32 @@ function library:Init(Config)
 			TweenWrapper:CreateStyle("slider_drag", 0.05, Enum.EasingStyle.Linear)
 
 			local ValueNum = values.default
-			local slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix or ValueNum .. suffix
+			local slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix
+				or ValueNum .. suffix
 			sliderValue.Text = slideText
 			local function UpdateSlider()
-				TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {Size = UDim2.new(0, math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X), 0, 12)}):Play()
+				TweenService:Create(
+					sliderIndicator,
+					TweenWrapper.Styles["slider_drag"],
+					{
+						Size = UDim2.new(
+							0,
+							math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X),
+							0,
+							12
+						),
+					}
+				):Play()
 
-				ValueNum = math.floor((((tonumber(values.max) - tonumber(values.min)) / sliderBackground.AbsoluteSize.X) * sliderIndicator.AbsoluteSize.X) + tonumber(values.min)) or 0.00
+				ValueNum = math.floor(
+					(
+						((tonumber(values.max) - tonumber(values.min)) / sliderBackground.AbsoluteSize.X)
+						* sliderIndicator.AbsoluteSize.X
+					) + tonumber(values.min)
+				) or 0.00
 
-				local slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix or ValueNum .. suffix
+				local slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix
+					or ValueNum .. suffix
 
 				sliderValue.Text = slideText
 
@@ -2450,16 +2667,37 @@ function library:Init(Config)
 				sliderValue.Text = slideText
 
 				moveconnection = Mouse.Move:Connect(function()
-					ValueNum = math.floor((((tonumber(values.max) - tonumber(values.min)) / sliderBackground.AbsoluteSize.X) * sliderIndicator.AbsoluteSize.X) + tonumber(values.min))
+					ValueNum = math.floor(
+						(
+							((tonumber(values.max) - tonumber(values.min)) / sliderBackground.AbsoluteSize.X)
+							* sliderIndicator.AbsoluteSize.X
+						) + tonumber(values.min)
+					)
 
-					slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix or ValueNum .. suffix
+					slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix
+						or ValueNum .. suffix
 					sliderValue.Text = slideText
 
 					pcall(function()
 						callback(ValueNum)
 					end)
 
-					TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {Size = UDim2.new(0, math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X), 0, 12)}):Play()
+					TweenService:Create(
+						sliderIndicator,
+						TweenWrapper.Styles["slider_drag"],
+						{
+							Size = UDim2.new(
+								0,
+								math.clamp(
+									Mouse.X - sliderIndicator.AbsolutePosition.X,
+									0,
+									sliderBackground.AbsoluteSize.X
+								),
+								0,
+								12
+							),
+						}
+					):Play()
 					if not UserInputService.WindowFocused then
 						moveconnection:Disconnect()
 					end
@@ -2467,16 +2705,37 @@ function library:Init(Config)
 
 				releaseconnection = UserInputService.InputEnded:Connect(function(Mouse_2)
 					if Mouse_2.UserInputType == Enum.UserInputType.MouseButton1 then
-						ValueNum = math.floor((((tonumber(values.max) - tonumber(values.min)) / sliderBackground.AbsoluteSize.X) * sliderIndicator.AbsoluteSize.X) + tonumber(values.min))
+						ValueNum = math.floor(
+							(
+								((tonumber(values.max) - tonumber(values.min)) / sliderBackground.AbsoluteSize.X)
+								* sliderIndicator.AbsoluteSize.X
+							) + tonumber(values.min)
+						)
 
-						slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix or ValueNum .. suffix
+						slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix
+							or ValueNum .. suffix
 						sliderValue.Text = slideText
 
 						pcall(function()
 							callback(ValueNum)
 						end)
 
-						TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {Size = UDim2.new(0, math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X), 0, 12)}):Play()
+						TweenService:Create(
+							sliderIndicator,
+							TweenWrapper.Styles["slider_drag"],
+							{
+								Size = UDim2.new(
+									0,
+									math.clamp(
+										Mouse.X - sliderIndicator.AbsolutePosition.X,
+										0,
+										sliderBackground.AbsoluteSize.X
+									),
+									0,
+									12
+								),
+							}
+						):Play()
 						moveconnection:Disconnect()
 						releaseconnection:Disconnect()
 					end
@@ -2487,10 +2746,8 @@ function library:Init(Config)
 				UpdateSlider()
 			end)
 
-
-
 			local SliderFunctions = {}
-			OptionStates[sliderButton] = {values.default, SliderFunctions}
+			OptionStates[sliderButton] = { values.default, SliderFunctions }
 
 			function SliderFunctions:Set(new, NoCallBack)
 				local ncalc1 = new - values.min
@@ -2510,7 +2767,8 @@ function library:Init(Config)
 			function SliderFunctions:Max(new)
 				new = new or values.max
 				values.max = new + 1
-				slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix or ValueNum .. suffix
+				slideText = compare and ValueNum .. compareSign .. tostring(values.max - 1) .. suffix
+					or ValueNum .. suffix
 				return self
 			end
 
@@ -2518,7 +2776,18 @@ function library:Init(Config)
 				new = new or values.min
 				values.min = new
 				slideText = compare and new .. compareSign .. tostring(values.max - 1) .. suffix or ValueNum .. suffix
-				TweenService:Create(sliderIndicator, TweenWrapper.Styles["slider_drag"], {Size = UDim2.new(0, math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X), 0, 12)}):Play()
+				TweenService:Create(
+					sliderIndicator,
+					TweenWrapper.Styles["slider_drag"],
+					{
+						Size = UDim2.new(
+							0,
+							math.clamp(Mouse.X - sliderIndicator.AbsolutePosition.X, 0, sliderBackground.AbsoluteSize.X),
+							0,
+							12
+						),
+					}
+				):Play()
 				return self
 			end
 
@@ -2583,8 +2852,6 @@ function library:Init(Config)
 			rightBar.Position = UDim2.new(0.308080822, 0, 0.479166657, 0)
 			rightBar.Size = UDim2.new(0, 403, 0, 1)
 
-
-
 			local SeperatorFunctions = {}
 			function SeperatorFunctions:Hide()
 				sectionFrame.Visible = false
@@ -2605,19 +2872,26 @@ function library:Init(Config)
 
 		function Components:Open()
 			TabLibrary.CurrentTab = title
-			for i,v in next, container:GetChildren() do 
+			for i, v in next, container:GetChildren() do
 				if v:IsA("ScrollingFrame") then
 					v.Visible = false
 				end
 			end
 			page.Visible = true
 
-			for i,v in next, tabButtons:GetChildren() do
+			for i, v in next, tabButtons:GetChildren() do
 				if v:IsA("TextButton") then
-					TweenService:Create(v, TweenWrapper.Styles["tab_text_colour"], {TextColor3 = Color3.fromRGB(170, 170, 170)}):Play()
+					TweenService
+						:Create(
+							v,
+							TweenWrapper.Styles["tab_text_colour"],
+							{ TextColor3 = Color3.fromRGB(170, 170, 170) }
+						)
+						:Play()
 				end
 			end
-			TweenService:Create(tabButton, TweenWrapper.Styles["tab_text_colour"], {TextColor3 = library.acientColor}):Play()
+			TweenService:Create(tabButton, TweenWrapper.Styles["tab_text_colour"], { TextColor3 = library.acientColor })
+				:Play()
 
 			return Components
 		end
@@ -2657,7 +2931,6 @@ function library:Init(Config)
 
 		return self
 	end
-
 
 	return library
 end
