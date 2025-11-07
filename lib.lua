@@ -91,6 +91,14 @@ local Blur = Instance.new("BlurEffect", CurrentCam)
 Blur.Enabled = true
 Blur.Size = 0
 
+function library:SetBlurEffect(enabled)
+	library.BlurEffect = enabled
+	if Blur and typeof(Blur) == "Instance" then
+		Blur.Enabled = enabled
+	end
+	return self
+end
+
 -- / Tween table & function
 local TweenWrapper = {}
 
@@ -2917,25 +2925,6 @@ function library:Init(Config)
 		return Components
 	end
 
-	--/ Config Tab (Menu key config)
-	local ConfigTab = library:NewTab("Config")
-	-- Show a simple label + keybind control. The NewKeybind control returns a key name string
-	-- in its callback; convert that to Enum.KeyCode and update library.Key so the UI
-	-- toggle uses the new key immediately.
-	ConfigTab:NewLabel("Menu Key")
-	ConfigTab:NewKeybind("Menu Key", library.Key, function(keyName)
-		if not keyName then
-			return
-		end
-		-- keyName is expected to be a string like "LeftAlt". Safely update library.Key.
-		pcall(function()
-			local newKey = Enum.KeyCode[keyName]
-			if newKey then
-				library.Key = newKey
-			end
-		end)
-	end)
-
 	function library:Remove()
 		screen:Destroy()
 		library:Panic()
@@ -2947,4 +2936,3 @@ function library:Init(Config)
 end
 
 return library
- 
