@@ -53,26 +53,24 @@ local VisualsTab = library:NewTab("Visuals")
 
 local CompanyText = "RobertHook"
 local TypeSpeed = 0.1
--- FOV and menu/company configuration
+
 local DefaultFOV = 70
 local CurrentFOV = DefaultFOV
 local FOVEnabled = false
 local FOVConnection = nil
 local MenuOpen = false
-local MenuFOVEnabled = true -- when false, menu open/close won't animate FOV
+local MenuFOVEnabled = true 
 local _FOVOverrideConnection = nil
 
--- Create Config tab last so tab order is: Movement, Visuals, Config
 local ConfigTab = library:NewTab("Config")
 
--- Blur Effect toggle in Config (uses library:SetBlurEffect)
 ConfigTab:NewToggle("Blur Effect", (library.BlurEnabled == nil) and true or library.BlurEnabled, function(val)
 	if library.SetBlurEffect then
 		library:SetBlurEffect(val)
 	end
-	-- Control whether the menu open/close FOV animation runs
+
 	MenuFOVEnabled = val
-	-- If blur is turned off, immediately reset camera FOV to the correct value
+
 	if not val and workspace and workspace.CurrentCamera then
 		if FOVEnabled then
 			workspace.CurrentCamera.FieldOfView = CurrentFOV
@@ -82,7 +80,6 @@ ConfigTab:NewToggle("Blur Effect", (library.BlurEnabled == nil) and true or libr
 	end
 end)
 
--- Menu Name textbox (binds to CompanyText/menu typing animation)
 ConfigTab:NewTextbox("Menu Name", CompanyText, "", "small", true, false, function(val)
 	if val and val ~= "" then
 		CompanyText = val
@@ -92,7 +89,6 @@ ConfigTab:NewTextbox("Menu Name", CompanyText, "", "small", true, false, functio
 	end
 end)
 
--- Single Menu Key keybind (no duplicate label)
 ConfigTab:NewKeybind("Menu Key", library.Key, function(keyName)
 	if not keyName then
 		return
@@ -109,7 +105,6 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Replace the server-region unique id block with our build name + version
 local function UpdateServerRegionLabel()
 	local ok, err = pcall(function()
 		if not LocalPlayer then
@@ -147,29 +142,26 @@ local function UpdateServerRegionLabel()
 			return
 		end
 
-		-- Ensure RichText is enabled so tags render
 		pcall(function()
 			label.RichText = true
 		end)
 
 		local newInner = "RobertHook " .. tostring(MenuVersion or "")
-		-- Try to replace content inside <font...><stroke...>...</stroke></font>
+
 		local replaced, count = label.Text:gsub("(<font.-<stroke.-%>)(.-)(</stroke></font>)", "%1" .. newInner .. "%3")
 		if count > 0 then
 			label.Text = replaced
 			return
 		end
 
-		-- Fallback: replace first parenthesized block
 		local fallback = label.Text:gsub("%b()", "(" .. newInner .. ")", 1)
 		label.Text = fallback
 	end)
 	if not ok then
-		-- ignore errors
+
 	end
 end
 
--- Try updating a few times after player GUI loads
 task.spawn(function()
 	for i = 1, 20 do
 		UpdateServerRegionLabel()
@@ -181,7 +173,7 @@ local ShowIndicator = false
 local RobertWalkIndicatorLabel = nil
 local IndicatorPosition = "Center"
 local IndicatorOutline = false
-local IndicatorSize = 1 -- slider 1-10; 1 means base size
+local IndicatorSize = 1 
 local BaseIndicatorTextSize = 16
 
 local function SetLabelPosition(label)
@@ -430,7 +422,6 @@ local NoFireToggle = VisualsTab:NewToggle("No Fire", false, function(value)
 	end
 end)
 
--- Auto Ready: when the Ready TextButton becomes Visible, fire the Ready remote once
 local AutoReadyEnabled = false
 local _AutoReadyConn = nil
 local _AutoReadyPoll = nil
@@ -459,20 +450,20 @@ local function StartAutoReady()
 				local prompts = main and main:FindFirstChild("Prompts")
 				local readyBtn = prompts and prompts:FindFirstChild("Ready")
 				if readyBtn and readyBtn:IsA("TextButton") then
-					-- attach property changed if not attached
+
 					if not _AutoReadyConn then
 						_AutoReadyConn = readyBtn:GetPropertyChangedSignal("Visible"):Connect(function()
 							if readyBtn.Visible then
 								TryFireReady()
 							end
 						end)
-						-- run once if already visible
+
 						if readyBtn.Visible then
 							TryFireReady()
 						end
 					end
 				else
-					-- no ready button found; ensure any old conn is cleared
+
 					if _AutoReadyConn then
 						_AutoReadyConn:Disconnect()
 						_AutoReadyConn = nil
@@ -481,7 +472,7 @@ local function StartAutoReady()
 			end
 			task.wait(0.25)
 		end
-		-- cleanup when loop exits
+
 		if _AutoReadyConn then
 			_AutoReadyConn:Disconnect()
 			_AutoReadyConn = nil
@@ -496,7 +487,7 @@ local function StopAutoReady()
 		_AutoReadyConn:Disconnect()
 		_AutoReadyConn = nil
 	end
-	-- _AutoReadyPoll will exit on its own
+
 end
 
 local _AutoReadyToggle = VisualsTab:NewToggle("Auto Ready", false, function(val)
@@ -510,9 +501,8 @@ end)
 
 local RobertRotationEnabled = false
 local RobertRotationConnection
-local RobertRotationDesired = false -- user's requested state (survives respawn/UI resets)
+local RobertRotationDesired = false 
 
--- Helper to (re)establish or tear down the rotation connection according to desired state
 local function EnsureRobertRotationConnection()
 	if RobertRotationDesired then
 		if not RobertRotationConnection then
@@ -520,7 +510,7 @@ local function EnsureRobertRotationConnection()
 			RobertRotationConnection = RunService.Heartbeat:Connect(function()
 				local ok, err = pcall(UpdateRotation)
 				if not ok then
-					-- prevent errors from killing the connection; log once
+
 					print("[RobertRotation] UpdateRotation error:", err)
 				end
 			end)
@@ -544,7 +534,6 @@ local function UpdateRotation()
 		return
 	end
 
-	-- Try to find the Bomb tool and its BombHandle inside the local player's character
 	local bombTool = LocalPlayer.Character:FindFirstChild("Bomb")
 	local bombHandlePart = nil
 	if bombTool and bombTool:IsA("Tool") then
@@ -553,7 +542,7 @@ local function UpdateRotation()
 			bombHandlePart = candidate
 		end
 	end
-	-- fallback to HumanoidRootPart if no bomb handle found
+
 	if not bombHandlePart then
 		bombHandlePart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 		if not bombHandlePart or not bombHandlePart:IsA("BasePart") then
@@ -561,7 +550,6 @@ local function UpdateRotation()
 		end
 	end
 
-	-- Find nearest valid target using bombHandle position and a max distance of 15 studs
 	local nearestDistance = math.huge
 	local nearestPlayer = nil
 	for _, player in ipairs(Players:GetPlayers()) do
@@ -583,27 +571,26 @@ local function UpdateRotation()
 	local myRoot = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local targetRoot = nearestPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if myRoot and targetRoot and bombHandlePart then
-		-- rotate so the bombHandle faces the target horizontally
+
 		local direction = (targetRoot.Position - bombHandlePart.Position)
 		local horizontal = Vector3.new(direction.X, 0, direction.Z)
 		local hd = horizontal.Magnitude
 		if hd > 0.001 then
 			local desiredDir = horizontal.Unit
-			-- desired yaw (use X/Z components). Adjust signs if your coordinate
-			-- system is flipped in-game.
+
 			local desiredYaw = math.atan2(-desiredDir.X, -desiredDir.Z)
 			local look = myRoot.CFrame.LookVector
 			local currentYaw = math.atan2(-look.X, -look.Z)
 			local delta = desiredYaw - currentYaw
-			-- wrap to (-pi, pi]
+
 			while delta > math.pi do
 				delta = delta - 2 * math.pi
 			end
 			while delta <= -math.pi do
 				delta = delta + 2 * math.pi
 			end
-			-- reduce max-step when very close so rotation is slow and stable
-			local maxDeg = (hd < 0.6) and 8 or 20 -- degrees per frame
+
+			local maxDeg = (hd < 0.6) and 8 or 20 
 			local maxStep = math.rad(maxDeg)
 			if delta > maxStep then
 				delta = maxStep
@@ -617,21 +604,20 @@ local function UpdateRotation()
 end
 
 local _RobertRotationToggle = VisualsTab:NewToggle("Robert Rotation", false, function(val)
-	-- track desired state separately so we can restore after respawn/UI recreation
+
 	RobertRotationDesired = val
 	print("[RobertRotation] toggle callback, desired ->", tostring(val))
 	EnsureRobertRotationConnection()
 end):AddKeybind(Enum.KeyCode.Unknown)
 
--- If the character respawns or GUI recreates, ensure the desired state is honored
 if LocalPlayer then
 	LocalPlayer.CharacterAdded:Connect(function()
-		-- small delay to allow character/tool setup
+
 		task.wait(0.2)
 		EnsureRobertRotationConnection()
 	end)
 	LocalPlayer.CharacterRemoving:Connect(function()
-		-- keep desired state but tear down live connection
+
 		if RobertRotationConnection then
 			RobertRotationConnection:Disconnect()
 			RobertRotationConnection = nil
@@ -640,8 +626,6 @@ if LocalPlayer then
 	end)
 end
 
--- Safety poll: if some external action disconnects our connection or UI resets,
--- re-apply desired behavior periodically (low overhead)
 task.spawn(function()
 	while true do
 		EnsureRobertRotationConnection()
@@ -699,21 +683,20 @@ local oldShowUI = library.ShowUI
 library.ShowUI = function(self, visible)
 	local result = oldShowUI(self, visible)
 	MenuOpen = visible
-	-- If blur/menu-FOV is disabled, ensure camera FOV is set immediately and block any tween for a short time
+
 	if workspace and workspace.CurrentCamera then
 		if not (library.BlurEnabled and MenuFOVEnabled) then
 			if _FOVOverrideConnection then
 				_FOVOverrideConnection:Disconnect()
 				_FOVOverrideConnection = nil
 			end
-			-- Immediately set correct FOV
+
 			if FOVEnabled then
 				workspace.CurrentCamera.FieldOfView = CurrentFOV
 			else
 				workspace.CurrentCamera.FieldOfView = DefaultFOV
 			end
 
-			-- Temporarily enforce the FOV for a short duration to override any tweening the library may start
 			_FOVOverrideConnection = RunService.RenderStepped:Connect(function()
 				if workspace and workspace.CurrentCamera then
 					if FOVEnabled then
@@ -742,8 +725,7 @@ local function UpdateFOV()
 	if not camera then
 		return
 	end
-	-- If FOV is enabled, show CurrentFOV unless menu is open AND menu-FOV is allowed (blur on).
-	-- When blur/menu-FOV is disabled, we want the FOV value to persist even while the menu is open.
+
 	if FOVEnabled then
 		if (not MenuOpen) or not (library.BlurEnabled and MenuFOVEnabled) then
 			camera.FieldOfView = CurrentFOV
@@ -755,8 +737,6 @@ local function UpdateFOV()
 	end
 end
 
--- "No Ragdoll" feature removed per user request
--- Place FOV toggle and slider after all other Visuals toggles per user request
 local _FOVToggle = VisualsTab:NewToggle("FOV", false, function(val)
 	FOVEnabled = val
 	if FOVEnabled then
@@ -779,24 +759,23 @@ end)
 VisualsTab:NewSlider("FOV Value", "", false, "", { min = 70, max = 130, default = 70 }, function(val)
 	CurrentFOV = val
 	if FOVEnabled and workspace and workspace.CurrentCamera then
-		-- If the menu is closed, or if the menu-FOV/blur is disabled, apply immediately.
+
 		if (not MenuOpen) or not (library.BlurEnabled and MenuFOVEnabled) then
 			workspace.CurrentCamera.FieldOfView = val
 		end
 	end
 end)
 
--- Company typing animation (uses CompanyText defined earlier)
 task.spawn(function()
 	while true do
 		local len = #CompanyText
-		-- grow
+
 		for i = 1, len do
 			library:SetCompany(CompanyText:sub(1, i))
 			task.wait(TypeSpeed)
 		end
 		task.wait(1)
-		-- shrink all the way to empty (i = 0)
+
 		for i = len, 0, -1 do
 			if i == 0 then
 				library:SetCompany("")
