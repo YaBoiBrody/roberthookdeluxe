@@ -501,30 +501,6 @@ end)
 
 local RobertRotationEnabled = false
 local RobertRotationConnection
-local RobertRotationDesired = false 
-
-local function EnsureRobertRotationConnection()
-	if RobertRotationDesired then
-		if not RobertRotationConnection then
-			print("[RobertRotation] establishing connection (desired=true)")
-			RobertRotationConnection = RunService.Heartbeat:Connect(function()
-				local ok, err = pcall(UpdateRotation)
-				if not ok then
-
-					print("[RobertRotation] UpdateRotation error:", err)
-				end
-			end)
-			RobertRotationEnabled = true
-		end
-	else
-		if RobertRotationConnection then
-			print("[RobertRotation] tearing down connection (desired=false)")
-			RobertRotationConnection:Disconnect()
-			RobertRotationConnection = nil
-		end
-		RobertRotationEnabled = false
-	end
-end
 
 local function UpdateRotation()
 	if not RobertRotationEnabled then
@@ -604,34 +580,16 @@ local function UpdateRotation()
 end
 
 local _RobertRotationToggle = VisualsTab:NewToggle("Robert Rotation", false, function(val)
-
-	RobertRotationDesired = val
-	print("[RobertRotation] toggle callback, desired ->", tostring(val))
-	EnsureRobertRotationConnection()
-end):AddKeybind(Enum.KeyCode.Unknown)
-
-if LocalPlayer then
-	LocalPlayer.CharacterAdded:Connect(function()
-
-		task.wait(0.2)
-		EnsureRobertRotationConnection()
-	end)
-	LocalPlayer.CharacterRemoving:Connect(function()
-
+	RobertRotationEnabled = val
+	if RobertRotationEnabled then
+		RobertRotationConnection = RunService.Heartbeat:Connect(UpdateRotation)
+	else
 		if RobertRotationConnection then
 			RobertRotationConnection:Disconnect()
 			RobertRotationConnection = nil
 		end
-		RobertRotationEnabled = false
-	end)
-end
-
-task.spawn(function()
-	while true do
-		EnsureRobertRotationConnection()
-		task.wait(1)
 	end
-end)
+end):AddKeybind(Enum.KeyCode.Unknown)
 
 local RobertBombEnabled = false
 local RobertBombConnection
